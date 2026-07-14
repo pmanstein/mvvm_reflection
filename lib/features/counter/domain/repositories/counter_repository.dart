@@ -1,4 +1,6 @@
+import 'package:mvvm_reflaction/utils/result.dart';
+
 abstract class CounterRepository {
-  int getCurrentCount();
-  int increment();
+  Result<int> getCurrentCount();
+  Result<int> increment();
 }

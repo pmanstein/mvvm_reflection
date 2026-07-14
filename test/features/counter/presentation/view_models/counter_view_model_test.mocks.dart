@@ -4,8 +4,10 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i4;
 import 'package:mvvm_reflaction/features/counter/domain/usecases/increment_counter_use_case.dart'
     as _i2;
+import 'package:mvvm_reflaction/utils/result.dart' as _i3;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -27,11 +29,17 @@ import 'package:mvvm_reflaction/features/counter/domain/usecases/increment_count
 class MockIncrementCounterUseCase extends _i1.Mock
     implements _i2.IncrementCounterUseCase {
   @override
-  int execute() =>
+  _i3.Result<int> execute() =>
       (super.noSuchMethod(
             Invocation.method(#execute, []),
-            returnValue: 0,
-            returnValueForMissingStub: 0,
+            returnValue: _i4.dummyValue<_i3.Result<int>>(
+              this,
+              Invocation.method(#execute, []),
+            ),
+            returnValueForMissingStub: _i4.dummyValue<_i3.Result<int>>(
+              this,
+              Invocation.method(#execute, []),
+            ),
           )
-          as int);
+          as _i3.Result<int>);
 }

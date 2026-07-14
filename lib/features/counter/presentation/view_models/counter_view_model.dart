@@ -15,7 +15,16 @@ class CounterViewModel extends ChangeNotifier {
   int get count => _count;
 
   void _handleIncrement() {
-    final nextCount = _incrementCounterUseCase.execute();
+    final nextCount = _incrementCounterUseCase.execute().fold(
+      onOk: (value) => value,
+      onError: (error) {
+        if (kDebugMode) {
+          debugPrint('Failed to increment counter: $error');
+        }
+        return _count;
+      },
+    );
+
     _count = nextCount;
     notifyListeners();
   }

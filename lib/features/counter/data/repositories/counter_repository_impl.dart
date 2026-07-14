@@ -1,11 +1,12 @@
 import 'package:mvvm_reflaction/features/counter/domain/repositories/counter_repository.dart';
+import 'package:mvvm_reflaction/utils/result.dart';
 
 class CounterRepositoryImpl extends CounterRepository {
   int _count = 0;
 
   @override
-  int getCurrentCount() => _count;
+  Result<int> getCurrentCount() => Result.ok(_count);
 
   @override
-  int increment() => ++_count;
+  Result<int> increment() => Result.ok(++_count);
 }
