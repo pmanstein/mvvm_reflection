@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "mvvm_reflaction - Current Device",
+            "name": "mvvm_reflection - Current Device",
             "type": "dart",
             "request": "launch",
-            "program": "mvvm_reflaction/lib/main.dart"
+            "program": "mvvm_reflection/lib/main.dart"
         }
     ]
 }
