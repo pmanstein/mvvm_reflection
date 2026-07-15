@@ -5,55 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Current Device",
+            "name": "mvvm_reflaction - Current Device",
             "type": "dart",
             "request": "launch",
-            "program": "lib/main.dart"
-        },
-        {
-            "name": "Android",
-            "type": "dart",
-            "request": "launch",
-            "program": "lib/main.dart",
-            "deviceId": "android"
-        },
-        {
-            "name": "iPhone",
-            "type": "dart",
-            "request": "launch",
-            "program": "lib/main.dart",
-            "deviceId": "iphone"
-        },
-        {
-            "name": "macOS",
-            "type": "dart",
-            "request": "launch",
-            "program": "lib/main.dart",
-            "deviceId": "macos"
-        },
-        {
-            "name": "Web",
-            "type": "dart",
-            "request": "launch",
-            "program": "lib/main.dart",
-            "deviceId": "chrome",
-            "args": [
-                "--web-renderer",
-                "auto",
-            ]
-        },
-        {
-            "name": "Run all Tests",
-            "type": "dart",
-            "request": "launch",
-            "program": "./test/"
-        },
-        {
-            "name": "Profile",
-            "type": "dart",
-            "request": "launch",
-            "program": "lib/main.dart",
-            "flutterMode": "profile"
+            "program": "mvvm_reflaction/lib/main.dart"
         }
     ]
 }
