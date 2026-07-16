@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
 
-/// Abstract widget to bind View to ViewModel
-abstract class InjectablePage<VM extends ChangeNotifier>
+/// Widget to bind View to ViewModel,
+/// also disposes the ViewModel when the Widget is disposed,
+/// and rebuilds the Widget when the ViewModel notifies listeners.
+class InjectablePage<W extends Widget, VM extends ChangeNotifier>
     extends StatefulWidget {
   final VM viewModel;
+  final W Function(VM viewModel) viewBuilder;
 
-  const InjectablePage({super.key, required this.viewModel});
+  const InjectablePage({
+    super.key,
+    required this.viewModel,
+    required this.viewBuilder,
+  });
 
   @override
-  State<InjectablePage<VM>> createState() => _InjectablePageState<VM>();
+  State<InjectablePage<W, VM>> createState() => _InjectablePageState<W, VM>();
 
-  Widget build(BuildContext context);
+  W get view => viewBuilder(viewModel);
+
+  Widget build(BuildContext context) => viewBuilder(viewModel);
 }
 
-class _InjectablePageState<T extends ChangeNotifier>
-    extends State<InjectablePage<T>> {
+class _InjectablePageState<W extends Widget, T extends ChangeNotifier>
+    extends State<InjectablePage<W, T>> {
   @override
   void dispose() {
     widget.viewModel.dispose();
@@ -23,7 +32,7 @@ class _InjectablePageState<T extends ChangeNotifier>
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: widget.viewModel,
-    builder: (context, _) => widget.build(context),
-  );
+        listenable: widget.viewModel,
+        builder: (context, _) => widget.build(context),
+      );
 }

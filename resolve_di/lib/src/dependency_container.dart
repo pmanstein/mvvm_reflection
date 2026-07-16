@@ -127,29 +127,123 @@ class DependencyContainer {
     }
 
     return mirror.declarations.values.whereType<MethodMirror>().firstWhere(
-      (declaration) =>
-          declaration.isConstructor && declaration.constructorName == '',
-      orElse: () => throw StateError(
-        'Unable to find default constructor for ${mirror.simpleName}.',
-      ),
-    );
+          (declaration) =>
+              declaration.isConstructor && declaration.constructorName == '',
+          orElse: () => throw StateError(
+            'Unable to find default constructor for ${mirror.simpleName}.',
+          ),
+        );
   }
 
   void registerDependencies(Map<Type, Type> selectedBindings) {
     _selectedBindings.addAll(selectedBindings);
   }
 
-  T resolveView<
-    T extends InjectablePage<VM>,
-    VM extends ChangeNotifier
-  >() {
-    final classMirror = _findConcreteClassMirrorForType(T);
-    final instance = _createInstanceFromDefaultConstructor(classMirror) as T;
+  dynamic _readInstanceMember(Object instance, String memberName) {
+    return _inject.reflect(instance).invokeGetter(memberName);
+  }
+
+  VoidCallback? _tryCreateRunCallback(dynamic value) {
+    final dynamic candidate = value;
+    try {
+      final run = candidate.run;
+      if (run is Function) {
+        return () => run();
+      }
+    } on NoSuchMethodError {
+      return null;
+    }
+    return null;
+  }
+
+  dynamic _bindViewParameterValue(dynamic memberValue) {
+    if (memberValue is Function) {
+      return memberValue;
+    }
+
+    return _tryCreateRunCallback(memberValue) ?? memberValue;
+  }
+
+  W _createViewForViewModel<W extends Widget>(
+    ClassMirror viewClassMirror,
+    ClassMirror viewModelClassMirror,
+    ChangeNotifier viewModelInstance,
+  ) {
+    final viewConstructorMirror = _defaultConstructorMirror(viewClassMirror);
+    final parameters = viewConstructorMirror.parameters;
+
+    final positionalArgs = <dynamic>[];
+    final namedArgs = <Symbol, dynamic>{};
+
+    for (final param in parameters) {
+      final paramName = param.simpleName;
+      final viewModelMember = viewModelClassMirror.declarations[paramName];
+
+      if (viewModelMember is VariableMirror ||
+          viewModelMember is MethodMirror) {
+        final memberValue = _readInstanceMember(viewModelInstance, paramName);
+        final boundValue = _bindViewParameterValue(memberValue);
+        _log.info(
+          'Binding view model member: $paramName '
+          'to view constructor parameter: $paramName',
+        );
+
+        if (param.isNamed) {
+          namedArgs[Symbol(paramName)] = boundValue;
+        } else {
+          positionalArgs.add(boundValue);
+        }
+      } else {
+        _log.warning(
+          'No matching view model member found for view constructor parameter: $paramName. '
+          'Binding between view and view model will not be set up for this parameter.',
+        );
+
+        final paramType = param.type.reflectedType;
+        final mirrorClassForParameter = _findConcreteClassMirrorForType(
+          paramType,
+        );
+        if (param.isNamed) {
+          namedArgs[Symbol(paramName)] = _resolveFromMirror(
+            mirrorClassForParameter,
+          );
+        } else {
+          positionalArgs.add(_resolveFromMirror(mirrorClassForParameter));
+        }
+      }
+    }
+
+    final viewInstance =
+        viewClassMirror.newInstance('', positionalArgs, namedArgs) as W;
 
     _log.info(
-      'Instance of class: ${classMirror.simpleName} using $VM created successfully',
+      'Instance of class: ${viewClassMirror.simpleName} created successfully',
     );
 
-    return instance;
+    _log.info('Creating instance of class: ${viewClassMirror.simpleName}');
+    return viewInstance;
+  }
+
+  InjectablePage<W, VM>
+      resolveView<W extends Widget, VM extends ChangeNotifier>() {
+    final viewModelClassMirror = _findConcreteClassMirrorForType(VM);
+    final viewClassMirror = _findConcreteClassMirrorForType(W);
+
+    final viewModelInstance =
+        _createInstanceFromDefaultConstructor(viewModelClassMirror) as VM;
+
+    _log.info(
+      'Instance of class: ${viewModelClassMirror.simpleName} created successfully',
+    );
+
+    return InjectablePage<W, VM>(
+      key: UniqueKey(),
+      viewModel: viewModelInstance,
+      viewBuilder: (viewModel) => _createViewForViewModel<W>(
+        viewClassMirror,
+        viewModelClassMirror,
+        viewModel,
+      ),
+    );
   }
 }

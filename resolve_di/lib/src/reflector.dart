@@ -4,6 +4,7 @@ class Reflector extends Reflectable {
   const Reflector()
     : super(
         newInstanceCapability,
+        invokingCapability,
         declarationsCapability,
         reflectedTypeCapability,
         typeRelationsCapability,

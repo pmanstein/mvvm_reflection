@@ -4,6 +4,9 @@ import 'package:logging/logging.dart';
 import 'package:mvvm_reflection/features/counter/domain/usecases/increment_counter_use_case.dart';
 import 'package:resolve_di/resolve_di.dart';
 
+typedef IncrementExceptionHandler =
+    void Function(Object error, StackTrace stackTrace);
+
 @inject
 class CounterViewModel extends ChangeNotifier {
   final _log = Logger('CounterViewModel');
@@ -11,26 +14,34 @@ class CounterViewModel extends ChangeNotifier {
   final IncrementCounterUseCase _incrementCounterUseCase;
 
   int _count = 0;
-
-  CounterViewModel({required IncrementCounterUseCase incrementCounterUseCase})
-    : _incrementCounterUseCase = incrementCounterUseCase;
+  int get count => _count;
 
   late final Command<void, void> incrementCommand =
       Command.createSyncNoParamNoResult(_handleIncrement);
 
-  int get count => _count;
+  CounterViewModel({required IncrementCounterUseCase incrementCounterUseCase})
+    : _incrementCounterUseCase = incrementCounterUseCase;
 
   void _handleIncrement() {
-    final nextCount = _incrementCounterUseCase.execute().fold(
-      onOk: (value) => value,
-      onError: (error) {
-        _log.log(.WARNING, 'Failed to increment counter: $error');
-        return _count;
-      },
-    );
+    try {
+      final nextCount = _incrementCounterUseCase.execute().fold(
+        onOk: (value) => value,
+        onError: (error) {
+          _log.log(Level.WARNING, 'Failed to increment counter: $error');
+          return _count;
+        },
+      );
 
-    _count = nextCount;
-    notifyListeners();
+      _count = nextCount;
+      notifyListeners();
+    } catch (error, stackTrace) {
+      _log.log(
+        Level.WARNING,
+        'Increment command failed unexpectedly.',
+        error,
+        stackTrace,
+      );
+    }
   }
 
   @override

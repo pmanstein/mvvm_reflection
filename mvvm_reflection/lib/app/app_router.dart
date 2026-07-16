@@ -10,7 +10,7 @@ class AppRouter {
       GoRoute(
         path: '/',
         builder: (context, state) =>
-            resolveView<CounterPage, CounterViewModel>(),
+            resolveView<CounterView, CounterViewModel>(),
       ),
     ],
   );
