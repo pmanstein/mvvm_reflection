@@ -1,0 +1,23 @@
+# Config file for ./flutterw pub run build_runner build
+
+targets:
+  $default:
+    builders:
+      # Tell freezed to put all generated classes into lib/.generated
+      # instead of putting it next to the source class
+      freezed|freezed:
+        options:
+          build_extensions:
+            "^lib/{{}}.dart": "lib/.generated/{{}}.freezed.dart"
+      # Tell source_gen to put all generated classes into lib/.generated
+      # instead of putting it next to the source class
+      source_gen|combining_builder:
+        options:
+          build_extensions:
+            "^lib/{{}}.dart": "lib/.generated/{{}}.g.dart"
+      # Tell reflectable to create main.reflactale.dart and tests
+      reflectable_builder:
+        generate_for:
+          - test/**.dart
+        options:
+          formatted: true

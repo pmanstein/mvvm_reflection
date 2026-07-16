@@ -1,23 +1,27 @@
 {
-  "object": {
-    "artifacts": [],
-    "dependencies": [
+  "object" : {
+    "artifacts" : [
+
+    ],
+    "dependencies" : [
       {
-        "basedOn": null,
-        "packageRef": {
-          "identity": "flutterframework",
-          "kind": "fileSystem",
-          "location": "/Users/philipp.manstein/repos/mvvm_reflection/ios/Flutter/ephemeral/Packages/.packages/FlutterFramework",
-          "name": "FlutterFramework"
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "flutterframework",
+          "kind" : "fileSystem",
+          "location" : "/Users/philipp.manstein/repos/mvvm_reflection/mvvm_reflection/ios/Flutter/ephemeral/Packages/.packages/FlutterFramework",
+          "name" : "FlutterFramework"
         },
-        "state": {
-          "name": "fileSystem",
-          "path": "/Users/philipp.manstein/repos/mvvm_reflection/ios/Flutter/ephemeral/Packages/.packages/FlutterFramework"
+        "state" : {
+          "name" : "fileSystem",
+          "path" : "/Users/philipp.manstein/repos/mvvm_reflection/mvvm_reflection/ios/Flutter/ephemeral/Packages/.packages/FlutterFramework"
         },
-        "subpath": "flutterframework"
+        "subpath" : "flutterframework"
       }
     ],
-    "prebuilts": []
+    "prebuilts" : [
+
+    ]
   },
-  "version": 7
+  "version" : 7
 }

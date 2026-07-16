@@ -38,5 +38,25 @@
             "type": "shell",
             "command": "fvm dart fix --apply",
         },
+        {
+            "label": "melos bootstrap",
+            "type": "shell",
+            "command": "fvm exec melos bootstrap",
+        },
+        {
+            "label": "melos generate",
+            "type": "shell",
+            "command": "fvm exec melos generate",
+        },
+        {
+            "label": "melos test",
+            "type": "shell",
+            "command": "fvm exec melos test",
+        },
+        {
+            "label": "melos lint",
+            "type": "shell",
+            "command": "fvm exec melos lint",
+        }
     ]
 }
