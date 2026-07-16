@@ -10,6 +10,7 @@ workspace:
 
 dependencies:
   reflectable: ^5.0.1
+  logging: ^1.3.0
 
 dev_dependencies:
   melos: ^8.2.2

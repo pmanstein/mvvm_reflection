@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:reflectable/mirrors.dart';
 import 'package:resolve_di/src/injectable_page.dart';
 import 'package:resolve_di/src/reflector.dart';
 
 class DependencyContainer {
+  final _log = Logger('DependencyContainer');
+
   final Map<String, dynamic> _instances = {};
   final Map<Type, Type> _selectedBindings = {};
 
@@ -55,7 +58,7 @@ class DependencyContainer {
 
   dynamic _resolveFromMirror(ClassMirror classMirror) {
     if (_instances.containsKey(classMirror.simpleName)) {
-      print('Using existing instance of class: ${classMirror.simpleName}');
+      _log.info('Using existing instance of class: ${classMirror.simpleName}');
       return _instances[classMirror.simpleName];
     }
 
@@ -63,7 +66,7 @@ class DependencyContainer {
         _instances.containsKey(
           classMirror.superinterfaces.firstOrNull?.simpleName,
         )) {
-      print(
+      _log.info(
         'Using existing instance of class: '
         '${classMirror.superinterfaces.firstOrNull?.simpleName}',
       );
@@ -72,13 +75,13 @@ class DependencyContainer {
 
     final instance = _createInstanceFromDefaultConstructor(classMirror);
 
-    print(
+    _log.info(
       'Adding instance of class: ${classMirror.simpleName} to instances map',
     );
     _instances[classMirror.simpleName] = instance;
 
     if (classMirror.superinterfaces.isNotEmpty) {
-      print(
+      _log.info(
         'Adding instance of class: '
         '${classMirror.superinterfaces.firstOrNull!.simpleName} to instances map',
       );
@@ -86,7 +89,9 @@ class DependencyContainer {
           instance;
     }
 
-    print('Instance of class: ${classMirror.simpleName} created successfully');
+    _log.info(
+      'Instance of class: ${classMirror.simpleName} created successfully',
+    );
     return instance;
   }
 
@@ -111,7 +116,7 @@ class DependencyContainer {
       }
     }
 
-    print('Creating instance of class: ${classMirror.simpleName}');
+    _log.info('Creating instance of class: ${classMirror.simpleName}');
     return classMirror.newInstance('', positionalArgs, namedArgs);
   }
 
@@ -141,7 +146,7 @@ class DependencyContainer {
     final classMirror = _findConcreteClassMirrorForType(T);
     final instance = _createInstanceFromDefaultConstructor(classMirror) as T;
 
-    print(
+    _log.info(
       'Instance of class: ${classMirror.simpleName} using $vmType created successfully',
     );
 
