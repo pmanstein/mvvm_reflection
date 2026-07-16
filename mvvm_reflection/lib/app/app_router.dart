@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:mvvm_reflection/features/counter/presentation/view/counter_page.dart';
+import 'package:mvvm_reflection/features/counter/counter.dart';
 import 'package:resolve_di/resolve_di.dart';
 
 class AppRouter {
@@ -9,7 +9,8 @@ class AppRouter {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => resolveView<CounterPage>(),
+        builder: (context, state) =>
+            resolveView<CounterPage, CounterViewModel>(),
       ),
     ],
   );
