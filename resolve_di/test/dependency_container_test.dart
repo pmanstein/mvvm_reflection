@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:resolve_di/resolve_di.dart';
 import 'package:resolve_di/src/dependency_container.dart';
 import 'package:resolve_di/src/reflector.dart';
 
@@ -38,6 +40,41 @@ class NamedConsumer {
   final NamedDependency dependency;
 
   NamedConsumer({required this.dependency});
+}
+
+@testReflector
+class InjectedPage extends InjectablePage<ViewModel> {
+  const InjectedPage({required super.viewModel})
+    : super(key: const ValueKey('InjectedPage'));
+
+  @override
+  Widget build(BuildContext context) => View();
+}
+
+@testReflector
+class ViewModel extends ChangeNotifier {
+  final A dependency;
+
+  ViewModel({required this.dependency});
+
+  bool isGreaterThan(int value) => dependency.isGreaterThan(value);
+}
+
+class View extends StatelessWidget {
+  const View({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
+class NotInjectedPage extends InjectablePage<ViewModel> {
+  const NotInjectedPage({required super.viewModel})
+    : super(key: const ValueKey('InjectedPage'));
+
+  @override
+  Widget build(BuildContext context) => View();
 }
 
 void main() {
@@ -97,6 +134,25 @@ void main() {
         expect(a, isA<C>());
         expect(a.isGreaterThan(1), isTrue);
         expect(a.isGreaterThan(3), isFalse);
+      },
+    );
+  });
+
+  group('resolveView', () {
+    test('should resolve a view with its view model', () {
+      final injectedPage = testContainer.resolveView<InjectedPage, ViewModel>();
+
+      final viewModel = injectedPage.viewModel;
+      expect(viewModel.isGreaterThan(4), isTrue);
+    });
+
+    test(
+      'should throw an error when trying to resolve a view that is not registered',
+      () {
+        expect(
+          () => testContainer.resolveView<NotInjectedPage, ViewModel>(),
+          throwsA(isA<StateError>()),
+        );
       },
     );
   });
