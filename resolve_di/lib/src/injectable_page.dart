@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 /// Abstract widget to bind View to ViewModel
-abstract class InjectablePage<vmType extends ChangeNotifier>
+abstract class InjectablePage<VM extends ChangeNotifier>
     extends StatefulWidget {
-  final vmType viewModel;
+  final VM viewModel;
 
   const InjectablePage({super.key, required this.viewModel});
 
   @override
-  State<InjectablePage<vmType>> createState() => _InjectablePageState<vmType>();
+  State<InjectablePage<VM>> createState() => _InjectablePageState<VM>();
 
   Widget build(BuildContext context);
 }

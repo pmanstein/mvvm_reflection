@@ -140,14 +140,14 @@ class DependencyContainer {
   }
 
   T resolveView<
-    T extends InjectablePage<vmType>,
-    vmType extends ChangeNotifier
+    T extends InjectablePage<VM>,
+    VM extends ChangeNotifier
   >() {
     final classMirror = _findConcreteClassMirrorForType(T);
     final instance = _createInstanceFromDefaultConstructor(classMirror) as T;
 
     _log.info(
-      'Instance of class: ${classMirror.simpleName} using $vmType created successfully',
+      'Instance of class: ${classMirror.simpleName} using $VM created successfully',
     );
 
     return instance;
