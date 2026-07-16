@@ -127,12 +127,12 @@ class DependencyContainer {
     }
 
     return mirror.declarations.values.whereType<MethodMirror>().firstWhere(
-          (declaration) =>
-              declaration.isConstructor && declaration.constructorName == '',
-          orElse: () => throw StateError(
-            'Unable to find default constructor for ${mirror.simpleName}.',
-          ),
-        );
+      (declaration) =>
+          declaration.isConstructor && declaration.constructorName == '',
+      orElse: () => throw StateError(
+        'Unable to find default constructor for ${mirror.simpleName}.',
+      ),
+    );
   }
 
   void registerDependencies(Map<Type, Type> selectedBindings) {
@@ -225,7 +225,7 @@ class DependencyContainer {
   }
 
   InjectablePage<W, VM>
-      resolveView<W extends Widget, VM extends ChangeNotifier>() {
+  resolveView<W extends Widget, VM extends ChangeNotifier>() {
     final viewModelClassMirror = _findConcreteClassMirrorForType(VM);
     final viewClassMirror = _findConcreteClassMirrorForType(W);
 
@@ -237,7 +237,6 @@ class DependencyContainer {
     );
 
     return InjectablePage<W, VM>(
-      key: UniqueKey(),
       viewModel: viewModelInstance,
       viewBuilder: (viewModel) => _createViewForViewModel<W>(
         viewClassMirror,
