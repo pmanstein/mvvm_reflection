@@ -15,7 +15,7 @@ targets:
         options:
           build_extensions:
             "^lib/{{}}.dart": "lib/.generated/{{}}.g.dart"
-      # Tell reflectable to create main.reflactale.dart and tests
+      # Tell reflectable to create for tests
       reflectable_builder:
         generate_for:
           - test/**.dart

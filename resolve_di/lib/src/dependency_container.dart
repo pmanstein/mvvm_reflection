@@ -1,4 +1,4 @@
-import 'package:flutter/src/foundation/change_notifier.dart';
+import 'package:flutter/material.dart';
 import 'package:reflectable/mirrors.dart';
 import 'package:resolve_di/src/injectable_page.dart';
 import 'package:resolve_di/src/reflector.dart';
@@ -46,7 +46,8 @@ class DependencyContainer {
             ),
         orElse: () => throw StateError(
           'No class found for type $type. Remember to annotate the class '
-          'and its parameter classes with @reflector!',
+          'and its parameter classes with @inject (or the Reflector instance '
+          'used by this container)!',
         ),
       );
     }

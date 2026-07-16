@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:resolve_di/resolve_di.dart';
 import 'package:resolve_di/src/dependency_container.dart';
 import 'package:resolve_di/src/reflector.dart';
@@ -14,7 +15,8 @@ final _defaultContainer = DependencyContainer(inject);
 T resolve<T>() => _defaultContainer.resolve<T>();
 
 /// Resolves a new InjectablePage  and all it sub-dependcies as lazy singletons
-T resolveView<T extends InjectablePage>() => _defaultContainer.resolveView();
+T resolveView<T extends InjectablePage<VM>, VM extends ChangeNotifier>() =>
+    _defaultContainer.resolveView<T, VM>();
 
 /// Override dependencies with this method
 /// Example, using an explixit Interface for a Repository:

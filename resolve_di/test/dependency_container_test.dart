@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:resolve_di/src/dependency_container.dart';
 import 'package:resolve_di/src/reflector.dart';
+
 import 'dependency_container_test.reflectable.dart';
 
 const testReflector = Reflector();
