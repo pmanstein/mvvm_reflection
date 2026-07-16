@@ -221,7 +221,6 @@ class DependencyContainer {
       'Instance of class: ${viewClassMirror.simpleName} created successfully',
     );
 
-    _log.info('Creating instance of class: ${viewClassMirror.simpleName}');
     return viewInstance;
   }
 
