@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:resolve_di/resolve_di.dart';
 import 'package:resolve_di/src/dependency_container.dart';
 import 'package:resolve_di/src/reflector.dart';
+import 'package:command_it/command_it.dart';
 
 import 'dependency_container_test.reflectable.dart';
 
@@ -43,15 +43,6 @@ class NamedConsumer {
 }
 
 @testReflector
-class InjectedPage extends InjectablePage<ViewModel> {
-  const InjectedPage({required super.viewModel})
-    : super(key: const ValueKey('InjectedPage'));
-
-  @override
-  Widget build(BuildContext context) => View();
-}
-
-@testReflector
 class ViewModel extends ChangeNotifier {
   final A dependency;
 
@@ -60,8 +51,26 @@ class ViewModel extends ChangeNotifier {
   bool isGreaterThan(int value) => dependency.isGreaterThan(value);
 }
 
+@testReflector
 class View extends StatelessWidget {
-  const View({super.key});
+  final bool Function(int value) isGreaterThan;
+
+  const View({required this.isGreaterThan})
+      : super(key: const ValueKey('View'));
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      child: Text('Button'),
+      onPressed: () {
+        final _ = isGreaterThan(5);
+      },
+    );
+  }
+}
+
+class NonInjectedView extends StatelessWidget {
+  const NonInjectedView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +78,46 @@ class View extends StatelessWidget {
   }
 }
 
-class NotInjectedPage extends InjectablePage<ViewModel> {
-  const NotInjectedPage({required super.viewModel})
-    : super(key: const ValueKey('InjectedPage'));
+@testReflector
+class CommandViewModel extends ChangeNotifier {
+  final A dependency;
+
+  int _count = 0;
+  int get count => _count;
+
+  late final Command<void, void> incrementCommand =
+      Command.createSyncNoParamNoResult(_runIncrementCommand);
+
+  CommandViewModel({required this.dependency});
+
+  void _runIncrementCommand() {
+    _count++;
+    notifyListeners();
+  }
+}
+
+@testReflector
+class CommandView extends StatelessWidget {
+  final void Function() incrementCommand;
+
+  const CommandView({required this.incrementCommand})
+      : super(key: const ValueKey('CommandView'));
 
   @override
-  Widget build(BuildContext context) => View();
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+@testReflector
+class CounterSnapshotView extends StatelessWidget {
+  final int count;
+  final void Function() incrementCommand;
+
+  const CounterSnapshotView(
+      {required this.count, required this.incrementCommand})
+      : super(key: const ValueKey('CounterSnapshotView'));
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 void main() {
@@ -140,19 +183,55 @@ void main() {
 
   group('resolveView', () {
     test('should resolve a view with its view model', () {
-      final injectedPage = testContainer.resolveView<InjectedPage, ViewModel>();
+      final injectedPage = testContainer.resolveView<View, ViewModel>();
 
-      final viewModel = injectedPage.viewModel;
-      expect(viewModel.isGreaterThan(4), isTrue);
+      expect(injectedPage.viewModel.isGreaterThan(4), isTrue);
     });
 
     test(
       'should throw an error when trying to resolve a view that is not registered',
       () {
         expect(
-          () => testContainer.resolveView<NotInjectedPage, ViewModel>(),
+          () => testContainer.resolveView<NonInjectedView, ViewModel>(),
           throwsA(isA<StateError>()),
         );
+      },
+    );
+
+    test(
+      'should bind command-like members to run when view expects a callback',
+      () {
+        final injectedPage =
+            testContainer.resolveView<CommandView, CommandViewModel>();
+
+        expect(injectedPage.viewModel.count, equals(0));
+
+        injectedPage.view.incrementCommand();
+
+        expect(injectedPage.viewModel.count, equals(1));
+      },
+    );
+
+    test('should create a fresh view model instance per resolved view', () {
+      final firstPage =
+          testContainer.resolveView<CommandView, CommandViewModel>();
+      final secondPage =
+          testContainer.resolveView<CommandView, CommandViewModel>();
+
+      expect(identical(firstPage.viewModel, secondPage.viewModel), isFalse);
+    });
+
+    test(
+      'should rebuild view with updated view model values after command run',
+      () {
+        final injectedPage =
+            testContainer.resolveView<CounterSnapshotView, CommandViewModel>();
+
+        expect(injectedPage.view.count, equals(0));
+
+        injectedPage.view.incrementCommand();
+
+        expect(injectedPage.view.count, equals(1));
       },
     );
   });

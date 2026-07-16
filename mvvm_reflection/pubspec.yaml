@@ -23,6 +23,8 @@ dev_dependencies:
   freezed: ^2.3.0
   flutter_lints: ^6.0.0
   reflectable_builder: ^1.0.1
+  patrol: ^4.5.1
+  patrol_cli: ^4.5.1
   flutter_test:
     sdk: flutter
   mockito: ^5.3.0
@@ -30,3 +32,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+patrol:
+  test_directory: patrol_test
+  android:
+    package_name: com.example.mvvm_reflection
+  ios:
+    bundle_id: com.example.mvvmReflection

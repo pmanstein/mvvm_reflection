@@ -1,29 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
-import 'package:mvvm_reflection/features/counter/presentation/view_models/counter_view_model.dart';
 import 'package:resolve_di/resolve_di.dart';
 
 @inject
-class CounterPage extends InjectablePage<CounterViewModel> {
-  const CounterPage({required super.viewModel})
-    : super(key: const ValueKey('CounterPage'));
-
-  @override
-  Widget build(BuildContext context) => CounterView(
-    count: viewModel.count,
-    incrementCommand: viewModel.incrementCommand.run,
-  );
-}
-
 class CounterView extends StatelessWidget {
   final int count;
   final void Function() incrementCommand;
 
-  const CounterView({
-    required this.count,
-    required this.incrementCommand,
-    super.key,
-  });
+  const CounterView({required this.count, required this.incrementCommand})
+    : super(key: const ValueKey('CounterView'));
 
   @override
   Widget build(BuildContext context) => Scaffold(

@@ -57,6 +57,28 @@
             "label": "melos lint",
             "type": "shell",
             "command": "fvm exec melos lint",
+        },
+        {
+            "label": "melos generate:watch",
+            "type": "shell",
+            "command": "fvm exec melos generate:watch",
+        },
+        {
+            "label": "melos patrol:test:all",
+            "type": "shell",
+            "command": "fvm exec melos patrol:test:all",
+        },
+        {
+            "label": "melos patrol:test:select",
+            "type": "shell",
+            "command": "fvm exec melos patrol:test:select -- ${input:patrolTargetFile}",
+        }
+    ],
+    "inputs": [
+        {
+            "id": "patrolTargetFile",
+            "type": "promptString",
+            "description": "Patrol test target relative to package, e.g. patrol_test/counter_page_test.dart"
         }
     ]
 }

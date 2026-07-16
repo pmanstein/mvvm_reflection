@@ -23,7 +23,13 @@ melos:
   scripts:
     generate:
       run: melos exec -c 1 --depends-on build_runner -- dart run build_runner build --delete-conflicting-outputs
+    generate:watch:
+      run: melos exec -c 2 --depends-on build_runner -- dart run build_runner watch --delete-conflicting-outputs
     test:
       run: melos exec -c 1 --fail-fast --flutter --dir-exists=test -- flutter test
     lint:
       run: melos exec -c 1 --fail-fast --flutter --depends-on=flutter_lints -- flutter analyze
+    patrol:test:all:
+      run: melos exec -c 1 --fail-fast --flutter --depends-on=patrol --dir-exists=patrol_test -- dart run patrol_cli:main test
+    patrol:test:select:
+      run: melos exec -c 1 --fail-fast --flutter --depends-on=patrol --dir-exists=patrol_test -- dart run patrol_cli:main test --target $MELOS_SCRIPT_ARGS
