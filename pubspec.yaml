@@ -1,0 +1,28 @@
+name: mvvm_reflection_demo
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+
+workspace:
+  - mvvm_reflection
+  - resolve_di
+
+dependencies:
+  reflectable: ^5.0.1
+
+dev_dependencies:
+  melos: ^8.2.2
+  build_runner: ^2.5.4
+  flutter_lints: ^6.0.0
+  reflectable_builder: ^1.0.1
+
+melos:
+  sdkPath: .fvm/flutter_sdk
+  scripts:
+    generate:
+      run: melos exec -c 1 --depends-on build_runner -- dart run build_runner build --delete-conflicting-outputs
+    test:
+      run: melos exec -c 1 --fail-fast --flutter --dir-exists=test -- flutter test
+    lint:
+      run: melos exec -c 1 --fail-fast --flutter --depends-on=flutter_lints -- flutter analyze

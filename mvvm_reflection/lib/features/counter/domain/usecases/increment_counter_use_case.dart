@@ -1,8 +1,8 @@
-import 'package:mvvm_reflection/app/reflector.dart';
 import 'package:mvvm_reflection/features/counter/domain/repositories/counter_repository.dart';
 import 'package:mvvm_reflection/utils/result.dart';
+import 'package:resolve_di/resolve_di.dart';
 
-@appReflector
+@inject
 class IncrementCounterUseCase {
   final CounterRepository _counterRepository;
 

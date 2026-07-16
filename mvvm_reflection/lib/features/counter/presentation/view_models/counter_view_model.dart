@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:command_it/command_it.dart';
-import 'package:mvvm_reflection/app/reflector.dart';
 import 'package:mvvm_reflection/features/counter/domain/usecases/increment_counter_use_case.dart';
+import 'package:resolve_di/resolve_di.dart';
 
-@appReflector
+@inject
 class CounterViewModel extends ChangeNotifier {
   final IncrementCounterUseCase _incrementCounterUseCase;
 
