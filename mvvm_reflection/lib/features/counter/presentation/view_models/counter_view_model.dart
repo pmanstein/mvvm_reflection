@@ -4,9 +4,6 @@ import 'package:logging/logging.dart';
 import 'package:mvvm_reflection/features/counter/domain/usecases/increment_counter_use_case.dart';
 import 'package:resolve_di/resolve_di.dart';
 
-typedef IncrementExceptionHandler =
-    void Function(Object error, StackTrace stackTrace);
-
 @inject
 class CounterViewModel extends ChangeNotifier {
   final _log = Logger('CounterViewModel');
