@@ -177,8 +177,9 @@ class DependencyContainer {
 
     for (final param in parameters) {
       final paramName = param.simpleName;
-      final viewModelMember = viewModelClassMirror.declarations[paramName];
+      if (paramName == 'key') continue;
 
+      final viewModelMember = viewModelClassMirror.declarations[paramName];
       if (viewModelMember is VariableMirror ||
           viewModelMember is MethodMirror) {
         final memberValue = _readInstanceMember(viewModelInstance, paramName);
