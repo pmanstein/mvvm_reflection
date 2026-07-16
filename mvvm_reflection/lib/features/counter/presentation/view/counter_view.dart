@@ -7,8 +7,11 @@ class CounterView extends StatelessWidget {
   final int count;
   final void Function() incrementCommand;
 
-  const CounterView({required this.count, required this.incrementCommand})
-    : super(key: const ValueKey('CounterView'));
+  const CounterView({
+    super.key,
+    required this.count,
+    required this.incrementCommand,
+  });
 
   @override
   Widget build(BuildContext context) => Scaffold(
