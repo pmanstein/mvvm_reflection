@@ -204,7 +204,7 @@ void main() {
     });
 
     test(
-      'should resolve a view with its view model, but resolving the view model fails due to missing dependencies',
+      'should resolve the view model but throw when building the view without bindings',
       () {
         final injectedPage = testContainer.resolveView<View, ViewModel>({});
 
