@@ -1,5 +1,7 @@
+// import 'package:command_it/command_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mvvm_reflection/features/counter/counter.dart';
+import 'package:mvvm_reflection/utils/converters/converters.dart';
 import 'package:resolve_di/resolve_di.dart';
 
 class AppRouter {
@@ -9,8 +11,23 @@ class AppRouter {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) =>
-            resolveView<CounterView, CounterViewModel>(),
+        builder: (context, state) => resolveView<CounterView, CounterViewModel>({
+          const Bind('count', 'count'),
+          const Bind(
+            'incrementCommand',
+            'incrementCommand',
+            converter: CommandRunConverter(),
+          ),
+          // Alternatively, you can use a MapConverter to achieve the same effect as CommandRunConverter:
+          // Bind(
+          //   'incrementCommand',
+          //   'incrementCommand',
+          //   converter: MapConverter<Command<void, void>, void Function()>(
+          //     (incrementCommand) =>
+          //         () => incrementCommand.run(),
+          //   ),
+          // ),
+        }),
       ),
     ],
   );

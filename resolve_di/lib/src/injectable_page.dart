@@ -8,6 +8,8 @@ class InjectablePage<W extends Widget, VM extends ChangeNotifier>
   final VM viewModel;
   final W Function(VM viewModel) viewBuilder;
 
+  W get view => viewBuilder(viewModel);
+
   const InjectablePage({
     super.key,
     required this.viewModel,
@@ -16,8 +18,6 @@ class InjectablePage<W extends Widget, VM extends ChangeNotifier>
 
   @override
   State<InjectablePage<W, VM>> createState() => _InjectablePageState<W, VM>();
-
-  W get view => viewBuilder(viewModel);
 
   Widget build(BuildContext context) => viewBuilder(viewModel);
 }
@@ -32,7 +32,7 @@ class _InjectablePageState<W extends Widget, T extends ChangeNotifier>
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-        listenable: widget.viewModel,
-        builder: (context, _) => widget.build(context),
-      );
+    listenable: widget.viewModel,
+    builder: (context, _) => widget.build(context),
+  );
 }
