@@ -8,7 +8,13 @@
             "name": "mvvm_reflection - Current Device",
             "type": "dart",
             "request": "launch",
-            "program": "mvvm_reflection/lib/main.dart"
+            "program": "resolve_di/example/mvvm_reflection/lib/main.dart"
+        },
+        {
+            "name": "story_poker_app - Current Device",
+            "type": "dart",
+            "request": "launch",
+            "program": "resolve_di/example/advanced_demo/story_poker_app/lib/main.dart"
         }
     ]
 }
