@@ -5,8 +5,8 @@ environment:
   sdk: ^3.12.2
 
 workspace:
-  - mvvm_reflection
   - resolve_di
+  - resolve_di/example/mvvm_reflection
 
 dependencies:
   reflectable: ^5.0.1
@@ -23,7 +23,7 @@ melos:
   sdkPath: .fvm/flutter_sdk
   scripts:
     generate:
-      run: melos exec -c 1 --depends-on build_runner -- dart run build_runner build --delete-conflicting-outputs
+      run: melos exec -c 2 --depends-on build_runner -- dart run build_runner build --delete-conflicting-outputs
     generate:watch:
       run: melos exec -c 2 --depends-on build_runner -- dart run build_runner watch --delete-conflicting-outputs
     test:

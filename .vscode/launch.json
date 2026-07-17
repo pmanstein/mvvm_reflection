@@ -8,7 +8,7 @@
             "name": "mvvm_reflection - Current Device",
             "type": "dart",
             "request": "launch",
-            "program": "mvvm_reflection/lib/main.dart"
+            "program": "resolve_di/example/mvvm_reflection/lib/main.dart"
         }
     ]
 }
