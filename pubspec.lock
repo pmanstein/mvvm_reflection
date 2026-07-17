@@ -553,7 +553,7 @@ packages:
     source: hosted
     version: "1.9.1"
   patrol:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: patrol
       sha256: "1cb54197ba329a81cb0f7dca1ffae3b6425b4ea514a63b60dec9dbb9d662c866"
