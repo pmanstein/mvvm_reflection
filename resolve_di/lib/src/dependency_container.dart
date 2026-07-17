@@ -151,14 +151,30 @@ class DependencyContainer {
   ) {
     final namedArgs = <Symbol, dynamic>{};
 
-    // Check if the default (unnamed) constructor has parameters that require bindings.
     final ctor = _defaultConstructorMirror(viewClassMirror);
-    final hasBindableParams = ctor.parameters.any((p) => p.simpleName != 'key');
 
-    if (bindings.isEmpty && hasBindableParams) {
+    // Positional parameters (other than 'key') are not supported for view bindings.
+    final positionalParams = ctor.parameters
+        .where((p) => !p.isNamed && p.simpleName != 'key')
+        .toList();
+    if (positionalParams.isNotEmpty) {
+      throw StateError(
+        'View ${viewClassMirror.simpleName} has positional constructor '
+        'parameters (${positionalParams.map((p) => p.simpleName).join(', ')}). '
+        'Only named parameters are supported for view bindings.',
+      );
+    }
+
+    // Check that bindings are provided for all required (non-optional) parameters.
+    final requiredParams = ctor.parameters
+        .where((p) => p.simpleName != 'key' && !p.isOptional)
+        .toList();
+
+    if (bindings.isEmpty && requiredParams.isNotEmpty) {
+      final paramNames = requiredParams.map((p) => p.simpleName).join(', ');
       throw StateError(
         'No bindings provided for view: ${viewClassMirror.simpleName}. '
-        'The view requires constructor parameters (excluding key).',
+        'Required parameters without bindings: $paramNames.',
       );
     }
 
