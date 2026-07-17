@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:resolve_di/resolve_di.dart';
-import 'package:resolve_di/src/bind.dart';
 import 'package:resolve_di/src/dependency_container.dart';
 import 'package:resolve_di/src/reflector.dart';
 import 'package:command_it/command_it.dart';

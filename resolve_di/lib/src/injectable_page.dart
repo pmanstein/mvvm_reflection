@@ -25,6 +25,14 @@ class InjectablePage<W extends Widget, VM extends ChangeNotifier>
 class _InjectablePageState<W extends Widget, T extends ChangeNotifier>
     extends State<InjectablePage<W, T>> {
   @override
+  void didUpdateWidget(InjectablePage<W, T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.viewModel != widget.viewModel) {
+      oldWidget.viewModel.dispose();
+    }
+  }
+
+  @override
   void dispose() {
     widget.viewModel.dispose();
     super.dispose();
