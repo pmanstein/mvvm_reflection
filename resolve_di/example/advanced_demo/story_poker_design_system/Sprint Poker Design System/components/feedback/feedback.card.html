@@ -1,0 +1,28 @@
+<!-- @dsCard group="Components" viewport="700x320" name="Feedback" subtitle="Badge, Tag, Tooltip, Toast, Dialog" -->
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<div id="root" style="background:var(--bg-canvas);padding:20px"></div>
+<script type="text/babel">
+const {Badge,Tag,Tooltip,Toast,Dialog,Button,IconButton}=window.SprintPokerDesignSystem_1cc025;
+function Demo(){
+const [open,setOpen]=React.useState(false);
+return <div style={{display:'flex',flexDirection:'column',gap:16,fontFamily:'var(--font-sans)'}}>
+<div style={{display:'flex',gap:8,alignItems:'center'}}>
+<Badge tone="success">LIVE</Badge><Badge tone="neutral">ROUND 3</Badge><Badge tone="danger">ENDED</Badge><Badge tone="warning">PAUSED</Badge>
+</div>
+<div style={{display:'flex',gap:8}}>
+<Tag>Fibonacci</Tag><Tag onRemove={()=>{}}>T-shirt</Tag>
+</div>
+<div style={{display:'flex',gap:16,alignItems:'center'}}>
+<Tooltip label="Copy invite link"><IconButton icon="⧉" label="Copy" variant="outline" /></Tooltip>
+<Toast tone="success">Copied invite link</Toast>
+</div>
+<div><Button onClick={()=>setOpen(true)}>Open dialog</Button>
+<Dialog open={open} title="End round?" onClose={()=>setOpen(false)} footer={<><Button variant="ghost" onClick={()=>setOpen(false)}>Cancel</Button><Button variant="danger" onClick={()=>setOpen(false)}>End round</Button></>}>This clears current votes for everyone.</Dialog></div>
+</div>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+</script>

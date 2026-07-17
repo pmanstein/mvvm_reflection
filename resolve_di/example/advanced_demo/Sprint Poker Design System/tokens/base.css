@@ -1,6 +1,0 @@
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg-canvas);color:var(--text-primary);font-family:var(--font-sans);font-size:16px;-webkit-font-smoothing:antialiased}
-a{color:var(--accent-7);text-decoration:none}
-a:hover{color:var(--accent-8);text-decoration:underline}
-::selection{background:var(--accent-3);color:var(--text-primary)}
-code,kbd,.mono{font-family:var(--font-mono)}

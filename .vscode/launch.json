@@ -11,10 +11,10 @@
             "program": "resolve_di/example/mvvm_reflection/lib/main.dart"
         },
         {
-            "name": "advanced_example - Current Device",
+            "name": "story_poker_app - Current Device",
             "type": "dart",
             "request": "launch",
-            "program": "resolve_di/example/advanced_example/lib/main.dart"
+            "program": "resolve_di/example/advanced_demo/story_poker_app/lib/main.dart"
         }
     ]
 }

@@ -6,7 +6,11 @@ environment:
 
 workspace:
   - resolve_di
-  - resolve_di/example/*
+  - resolve_di/example/mvvm_reflection
+  - resolve_di/example/advanced_demo/story_poker_app
+  - resolve_di/example/advanced_demo/story_poker_design_system
+  - resolve_di/example/advanced_demo/story_poker_features
+  - resolve_di/example/advanced_demo/story_poker_shared
 
 dependencies:
   reflectable: ^5.0.1

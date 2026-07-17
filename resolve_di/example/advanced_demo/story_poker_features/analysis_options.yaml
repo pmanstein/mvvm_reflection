@@ -1,0 +1,13 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    prefer_initializing_formals: ignore
+  exclude:
+    # Do not analyze generated files
+    - "**/*.mocks.dart"
+
+linter:
+  rules:
+    always_use_package_imports: true
+    prefer_single_quotes: true
