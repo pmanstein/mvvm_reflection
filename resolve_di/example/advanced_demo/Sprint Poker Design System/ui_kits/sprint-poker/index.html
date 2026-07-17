@@ -1,0 +1,75 @@
+<!-- @dsCard group="Sprint Poker App" viewport="1280x800" name="App" subtitle="Full click-through: lobby, voting, reveal, history" -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sprint Poker</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+</head>
+<body style="margin:0">
+<div id="root"></div>
+<script type="text/babel" src="LobbyScreen.jsx"></script>
+<script type="text/babel" src="ParticipantsSidebar.jsx"></script>
+<script type="text/babel" src="VotingPanel.jsx"></script>
+<script type="text/babel" src="RevealPanel.jsx"></script>
+<script type="text/babel" src="HistoryPanel.jsx"></script>
+<script type="text/babel">
+const {IconButton,Badge}=window.SprintPokerDesignSystem_1cc025;
+const DECK=['1','2','3','5','8','13','21','?'];
+function App(){
+const [screen,setScreen]=React.useState('lobby');
+const [name,setName]=React.useState('');
+const [code,setCode]=React.useState('');
+const [tab,setTab]=React.useState('vote');
+const [selected,setSelected]=React.useState(null);
+const [participants,setParticipants]=React.useState([
+{name:'Priya Nair',role:'Eng',voteState:'waiting',voteValue:null},
+{name:'Sam Ito',role:'Eng',voteState:'waiting',voteValue:null},
+{name:'Alex Chen',role:'PM',voteState:'waiting',voteValue:null},
+]);
+const [rounds,setRounds]=React.useState([
+{title:'Login rate limiting',votes:['5','8','5','8'],avg:'6.5'},
+{title:'Search indexing job',votes:['3','3','2','3'],avg:'2.8'},
+]);
+const you='You';
+const allParticipants=React.useMemo(()=>[{name:you,role:'You',voteState:selected?'voted':'waiting',voteValue:selected},...participants],[selected,participants]);
+function enter(){setScreen('session');}
+function vote(v){
+setSelected(v);
+setParticipants(ps=>ps.map((p,i)=>i<2?{...p,voteState:'voted'}:p));
+}
+function reveal(){
+setParticipants(ps=>ps.map((p,i)=>({...p,voteState:'revealed',voteValue:p.voteValue||DECK[i%DECK.length]})));
+setTab('reveal');
+}
+function nextRound(){
+setSelected(null);
+setParticipants(ps=>ps.map(p=>({...p,voteState:'waiting',voteValue:null})));
+setTab('vote');
+}
+const allVoted=allParticipants.every(p=>p.voteState!=='waiting');
+if(screen==='lobby'){
+return React.createElement(window.LobbyScreen,{name,setName,code,setCode,onJoin:enter,onCreate:()=>{setCode('SP-4821');enter();}});
+}
+return React.createElement('div',{style:{display:'flex',minHeight:'100vh',background:'var(--bg-canvas)',fontFamily:'var(--font-sans)'}},
+React.createElement(window.ParticipantsSidebar,{participants:allParticipants,you}),
+React.createElement('div',{style:{flex:1,display:'flex',flexDirection:'column'}},
+React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'16px 40px',borderBottom:'1px solid var(--border-subtle)'}},
+React.createElement('div',{style:{display:'flex',gap:16,fontSize:'var(--text-body-sm)'}},
+['vote','history'].map(t=>React.createElement('div',{key:t,onClick:()=>setTab(t),style:{cursor:'pointer',color:tab===t?'var(--accent-6)':'var(--text-tertiary)',fontWeight:600,textTransform:'uppercase',letterSpacing:'var(--tracking-wide)',fontSize:'var(--text-caption)'}},t==='vote'?'Round':'History'))),
+React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center'}},
+React.createElement('span',{style:{fontFamily:'var(--font-mono)',fontSize:'var(--text-caption)',color:'var(--text-tertiary)'}},code||'SP-4821'),
+React.createElement(IconButton,{icon:'⧉',label:'Copy invite link'}))),
+tab==='history'?React.createElement(window.HistoryPanel,{rounds}):
+(!allVoted||participants.some(p=>p.voteState==='waiting'))&&participants.some(p=>p.voteState!=='revealed')?
+React.createElement(window.VotingPanel,{deck:DECK,selected,onSelect:vote,participants:allParticipants,onReveal:reveal,allVoted:allParticipants.every(p=>p.voteState!=='waiting')}):
+React.createElement(window.RevealPanel,{participants:allParticipants,onNextRound:nextRound})));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
