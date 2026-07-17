@@ -151,17 +151,14 @@ class DependencyContainer {
   ) {
     final namedArgs = <Symbol, dynamic>{};
 
-    // Check if the view requires constructor parameters but no bindings were provided
-    if (bindings.isEmpty &&
-        viewClassMirror.declarations.values.any(
-          (declaration) =>
-              declaration is MethodMirror &&
-              declaration.isConstructor &&
-              declaration.parameters.isNotEmpty,
-        )) {
+    // Check if the default (unnamed) constructor has parameters that require bindings.
+    final ctor = _defaultConstructorMirror(viewClassMirror);
+    final hasBindableParams = ctor.parameters.any((p) => p.simpleName != 'key');
+
+    if (bindings.isEmpty && hasBindableParams) {
       throw StateError(
         'No bindings provided for view: ${viewClassMirror.simpleName}. '
-        'The view requires constructor parameters.',
+        'The view requires constructor parameters (excluding key).',
       );
     }
 
