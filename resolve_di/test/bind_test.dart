@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:resolve_di/src/bind.dart';
+import 'package:resolve_di/resolve_di.dart';
 
 class _DoubleConverter extends BindConverter<int, int> {
   const _DoubleConverter();
