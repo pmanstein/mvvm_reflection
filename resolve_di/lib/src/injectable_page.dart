@@ -25,22 +25,32 @@ class InjectablePage<W extends Widget, VM extends ChangeNotifier>
 class _InjectablePageState<W extends Widget, T extends ChangeNotifier>
     extends State<InjectablePage<W, T>> {
   @override
+  void initState() {
+    super.initState();
+    widget.viewModel.addListener(_onViewModelChanged);
+  }
+
+  @override
   void didUpdateWidget(InjectablePage<W, T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.viewModel != widget.viewModel) {
+      oldWidget.viewModel.removeListener(_onViewModelChanged);
       oldWidget.viewModel.dispose();
+      widget.viewModel.addListener(_onViewModelChanged);
     }
   }
 
   @override
   void dispose() {
+    widget.viewModel.removeListener(_onViewModelChanged);
     widget.viewModel.dispose();
     super.dispose();
   }
 
+  void _onViewModelChanged() {
+    setState(() {});
+  }
+
   @override
-  Widget build(BuildContext context) => ListenableBuilder(
-    listenable: widget.viewModel,
-    builder: (context, _) => widget.build(context),
-  );
+  Widget build(BuildContext context) => widget.build(context);
 }
