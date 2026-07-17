@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:resolve_di/resolve_di.dart';
+import 'package:resolve_di/src/bind.dart';
 import 'package:resolve_di/src/dependency_container.dart';
 import 'package:resolve_di/src/reflector.dart';
 import 'package:command_it/command_it.dart';
 
 import 'dependency_container_test.reflectable.dart';
+
+/// Converter used in tests to turn a [Command<void,void>] into a [void Function()].
+class _VoidCommandConverter
+    extends BindConverter<Command<void, void>, void Function()> {
+  const _VoidCommandConverter();
+
+  @override
+  void Function() call(Command<void, void> command) =>
+      () => command.run();
+}
 
 const testReflector = Reflector();
 
@@ -56,7 +68,7 @@ class View extends StatelessWidget {
   final bool Function(int value) isGreaterThan;
 
   const View({required this.isGreaterThan})
-      : super(key: const ValueKey('View'));
+    : super(key: const ValueKey('View'));
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +113,7 @@ class CommandView extends StatelessWidget {
   final void Function() incrementCommand;
 
   const CommandView({required this.incrementCommand})
-      : super(key: const ValueKey('CommandView'));
+    : super(key: const ValueKey('CommandView'));
 
   @override
   Widget build(BuildContext context) => const SizedBox.shrink();
@@ -112,9 +124,10 @@ class CounterSnapshotView extends StatelessWidget {
   final int count;
   final void Function() incrementCommand;
 
-  const CounterSnapshotView(
-      {required this.count, required this.incrementCommand})
-      : super(key: const ValueKey('CounterSnapshotView'));
+  const CounterSnapshotView({
+    required this.count,
+    required this.incrementCommand,
+  }) : super(key: const ValueKey('CounterSnapshotView'));
 
   @override
   Widget build(BuildContext context) => const SizedBox.shrink();
@@ -183,40 +196,67 @@ void main() {
 
   group('resolveView', () {
     test('should resolve a view with its view model', () {
-      final injectedPage = testContainer.resolveView<View, ViewModel>();
+      final injectedPage = testContainer.resolveView<View, ViewModel>({
+        Bind('isGreaterThan', 'isGreaterThan'),
+      });
 
-      expect(injectedPage.viewModel.isGreaterThan(4), isTrue);
+      expect(injectedPage.view.isGreaterThan(4), isTrue);
     });
 
     test(
-      'should throw an error when trying to resolve a view that is not registered',
+      'should resolve a view with its view model, but resolving the view model fails due to missing dependencies',
       () {
+        final injectedPage = testContainer.resolveView<View, ViewModel>({});
+
+        expect(injectedPage, isA<InjectablePage<View, ViewModel>>());
+
         expect(
-          () => testContainer.resolveView<NonInjectedView, ViewModel>(),
+          () => injectedPage.viewBuilder(injectedPage.viewModel),
           throwsA(isA<StateError>()),
         );
       },
     );
 
     test(
-      'should bind command-like members to run when view expects a callback',
+      'should throw an error when trying to resolve a view that is not registered',
       () {
-        final injectedPage =
-            testContainer.resolveView<CommandView, CommandViewModel>();
-
-        expect(injectedPage.viewModel.count, equals(0));
-
-        injectedPage.view.incrementCommand();
-
-        expect(injectedPage.viewModel.count, equals(1));
+        expect(
+          () => testContainer.resolveView<NonInjectedView, ViewModel>({}),
+          throwsA(isA<StateError>()),
+        );
       },
     );
 
+    test('should bind Command to void Function() via converter', () {
+      final injectedPage = testContainer
+          .resolveView<CommandView, CommandViewModel>({
+            Bind(
+              'incrementCommand',
+              'incrementCommand',
+              converter: const _VoidCommandConverter(),
+            ),
+          });
+
+      expect(injectedPage.viewModel.count, equals(0));
+
+      injectedPage.view.incrementCommand();
+
+      expect(injectedPage.viewModel.count, equals(1));
+    });
+
     test('should create a fresh view model instance per resolved view', () {
-      final firstPage =
-          testContainer.resolveView<CommandView, CommandViewModel>();
-      final secondPage =
-          testContainer.resolveView<CommandView, CommandViewModel>();
+      const bindings = {
+        Bind(
+          'incrementCommand',
+          'incrementCommand',
+          converter: _VoidCommandConverter(),
+        ),
+      };
+
+      final firstPage = testContainer
+          .resolveView<CommandView, CommandViewModel>(bindings);
+      final secondPage = testContainer
+          .resolveView<CommandView, CommandViewModel>(bindings);
 
       expect(identical(firstPage.viewModel, secondPage.viewModel), isFalse);
     });
@@ -224,8 +264,15 @@ void main() {
     test(
       'should rebuild view with updated view model values after command run',
       () {
-        final injectedPage =
-            testContainer.resolveView<CounterSnapshotView, CommandViewModel>();
+        final injectedPage = testContainer
+            .resolveView<CounterSnapshotView, CommandViewModel>({
+              Bind('count', 'count'),
+              Bind(
+                'incrementCommand',
+                'incrementCommand',
+                converter: const _VoidCommandConverter(),
+              ),
+            });
 
         expect(injectedPage.view.count, equals(0));
 

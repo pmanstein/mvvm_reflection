@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:reflectable/mirrors.dart';
+import 'package:resolve_di/src/bind.dart';
 import 'package:resolve_di/src/injectable_page.dart';
 import 'package:resolve_di/src/reflector.dart';
 
@@ -143,79 +144,45 @@ class DependencyContainer {
     return _inject.reflect(instance).invokeGetter(memberName);
   }
 
-  VoidCallback? _tryCreateRunCallback(dynamic value) {
-    final dynamic candidate = value;
-    try {
-      final run = candidate.run;
-      if (run is Function) {
-        return () => run();
-      }
-    } on NoSuchMethodError {
-      return null;
-    }
-    return null;
-  }
-
-  dynamic _bindViewParameterValue(dynamic memberValue) {
-    if (memberValue is Function) {
-      return memberValue;
-    }
-
-    return _tryCreateRunCallback(memberValue) ?? memberValue;
-  }
-
-  W _createViewForViewModel<W extends Widget>(
+  W _createViewFromBindings<W extends Widget>(
     ClassMirror viewClassMirror,
-    ClassMirror viewModelClassMirror,
     ChangeNotifier viewModelInstance,
+    Set<Bind> bindings,
   ) {
-    final viewConstructorMirror = _defaultConstructorMirror(viewClassMirror);
-    final parameters = viewConstructorMirror.parameters;
-
-    final positionalArgs = <dynamic>[];
     final namedArgs = <Symbol, dynamic>{};
 
-    for (final param in parameters) {
-      final paramName = param.simpleName;
-      if (paramName == 'key') continue;
-
-      final viewModelMember = viewModelClassMirror.declarations[paramName];
-      if (viewModelMember is VariableMirror ||
-          viewModelMember is MethodMirror) {
-        final memberValue = _readInstanceMember(viewModelInstance, paramName);
-        final boundValue = _bindViewParameterValue(memberValue);
-        _log.info(
-          'Binding view model member: $paramName '
-          'to view constructor parameter: $paramName',
-        );
-
-        if (param.isNamed) {
-          namedArgs[Symbol(paramName)] = boundValue;
-        } else {
-          positionalArgs.add(boundValue);
-        }
-      } else {
-        _log.warning(
-          'No matching view model member found for view constructor parameter: $paramName. '
-          'Binding between view and view model will not be set up for this parameter.',
-        );
-
-        final paramType = param.type.reflectedType;
-        final mirrorClassForParameter = _findConcreteClassMirrorForType(
-          paramType,
-        );
-        if (param.isNamed) {
-          namedArgs[Symbol(paramName)] = _resolveFromMirror(
-            mirrorClassForParameter,
-          );
-        } else {
-          positionalArgs.add(_resolveFromMirror(mirrorClassForParameter));
-        }
-      }
+    // Check if the view requires constructor parameters but no bindings were provided
+    if (bindings.isEmpty &&
+        viewClassMirror.declarations.values.any(
+          (declaration) =>
+              declaration is MethodMirror &&
+              declaration.isConstructor &&
+              declaration.parameters.isNotEmpty,
+        )) {
+      throw StateError(
+        'No bindings provided for view: ${viewClassMirror.simpleName}. '
+        'The view requires constructor parameters.',
+      );
     }
 
-    final viewInstance =
-        viewClassMirror.newInstance('', positionalArgs, namedArgs) as W;
+    for (final bind in bindings) {
+      final vmValue = _readInstanceMember(
+        viewModelInstance,
+        bind.viewModelProperty,
+      );
+      final viewValue = bind.converter != null
+          ? bind.converter!.call(vmValue)
+          : vmValue;
+
+      _log.info(
+        'Binding vm.${bind.viewModelProperty} → view.${bind.viewProperty}'
+        '${bind.converter != null ? " (converted)" : ""}',
+      );
+
+      namedArgs[Symbol(bind.viewProperty)] = viewValue;
+    }
+
+    final viewInstance = viewClassMirror.newInstance('', [], namedArgs) as W;
 
     _log.info(
       'Instance of class: ${viewClassMirror.simpleName} created successfully',
@@ -225,7 +192,7 @@ class DependencyContainer {
   }
 
   InjectablePage<W, VM>
-  resolveView<W extends Widget, VM extends ChangeNotifier>() {
+  resolveView<W extends Widget, VM extends ChangeNotifier>(Set<Bind> bindings) {
     final viewModelClassMirror = _findConcreteClassMirrorForType(VM);
     final viewClassMirror = _findConcreteClassMirrorForType(W);
 
@@ -238,11 +205,8 @@ class DependencyContainer {
 
     return InjectablePage<W, VM>(
       viewModel: viewModelInstance,
-      viewBuilder: (viewModel) => _createViewForViewModel<W>(
-        viewClassMirror,
-        viewModelClassMirror,
-        viewModel,
-      ),
+      viewBuilder: (viewModel) =>
+          _createViewFromBindings<W>(viewClassMirror, viewModel, bindings),
     );
   }
 }
